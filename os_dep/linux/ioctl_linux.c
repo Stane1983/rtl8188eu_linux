@@ -157,7 +157,7 @@ static void indicate_wx_custom_event(_adapter *padapter, char *msg)
 	union iwreq_data wrqu;
 
 	if (strlen(msg) > IW_CUSTOM_MAX) {
-		DBG_871X("%s strlen(msg):%u > IW_CUSTOM_MAX:%u\n", __FUNCTION__ ,strlen(msg), IW_CUSTOM_MAX);
+		DBG_871X("%s strlen(msg):%lu > IW_CUSTOM_MAX:%d\n", __FUNCTION__ ,strlen(msg), IW_CUSTOM_MAX);
 		return;
 	}
 

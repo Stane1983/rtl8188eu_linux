@@ -847,7 +847,7 @@ __inline static void _set_workitem(_workitem *pwork)
 	typedef unsigned long _irqL;
 	typedef	struct	net_device * _nic_hdl;
 	
-	typedef pid_t		_thread_hdl_;
+	typedef struct	task_struct * _thread_hdl_;
 	typedef int		thread_return;
 	typedef void*	thread_context;
 
@@ -1394,7 +1394,7 @@ static __inline void thread_enter(char *name);
 static __inline void thread_enter(char *name)
 {
 #ifdef PLATFORM_LINUX
-	daemonize("%s", name);
+//	daemonize("%s", name);
 	allow_signal(SIGTERM);
 #endif
 #ifdef PLATFORM_FREEBSD

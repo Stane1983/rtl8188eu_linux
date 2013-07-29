@@ -47,6 +47,8 @@
 #include <rtw_br_ext.h>
 #endif //CONFIG_BR_EXT
 
+#include<linux/kthread.h>
+
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Realtek Wireless Lan Driver");
 MODULE_AUTHOR("Realtek Semiconductor Corp.");
@@ -619,6 +621,8 @@ void rtw_proc_remove_one(struct net_device *dev)
 
 		remove_proc_entry("rssi_disp", dir_dev);
 
+		remove_proc_entry("ampdu_enable", dir_dev);
+
 		remove_proc_entry(dev->name, rtw_proc);
 		dir_dev = NULL;
 		
@@ -978,27 +982,27 @@ u32 rtw_start_drv_threads(_adapter *padapter)
 
 	RT_TRACE(_module_os_intfs_c_,_drv_info_,("+rtw_start_drv_threads\n"));
 #ifdef CONFIG_XMIT_THREAD_MODE
-	padapter->xmitThread = kernel_thread(rtw_xmit_thread, padapter, CLONE_FS|CLONE_FILES);
-	if(padapter->xmitThread < 0)
+	padapter->xmitThread = kthread_run(rtw_xmit_thread, padapter, "xmit_thread");
+	if(IS_ERR(padapter->xmitThread))
 		_status = _FAIL;
 #endif
 
 #ifdef CONFIG_RECV_THREAD_MODE
-	padapter->recvThread = kernel_thread(rtw_recv_thread, padapter, CLONE_FS|CLONE_FILES);
-	if(padapter->recvThread < 0)
+	padapter->recvThread = kthread_run(rtw_recv_thread, padapter, "recv_thread");
+	if(IS_ERR(padapter->recvThread))
 		_status = _FAIL;	
 #endif
 
-	padapter->cmdThread = kernel_thread(rtw_cmd_thread, padapter, CLONE_FS|CLONE_FILES);
-	if(padapter->cmdThread < 0)
+	padapter->cmdThread = kthread_run(rtw_cmd_thread, padapter, "cmd_thread");
+	if(IS_ERR(padapter->cmdThread))
 		_status = _FAIL;
 	else
 		_rtw_down_sema(&padapter->cmdpriv.terminate_cmdthread_sema); //wait for cmd_thread to run
 		
 
 #ifdef CONFIG_EVENT_THREAD_MODE
-	padapter->evtThread = kernel_thread(event_thread, padapter, CLONE_FS|CLONE_FILES);
-	if(padapter->evtThread < 0)
+	padapter->evtThread = kthread_run(event_thread, padapter, "evt_thread");
+	if(IS_ERR(padapter->evtThread))
 		_status = _FAIL;		
 #endif
 

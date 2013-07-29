@@ -1090,8 +1090,8 @@ unsigned int OnAuth(_adapter *padapter, union recv_frame *precv_frame)
 	sa = GetAddr2Ptr(pframe);
 	
 	auth_mode = psecuritypriv->dot11AuthAlgrthm;
-	seq = cpu_to_le16(*(u16*)((SIZE_PTR)pframe + WLAN_HDR_A3_LEN + 2));
-	algorithm = cpu_to_le16(*(u16*)((SIZE_PTR)pframe + WLAN_HDR_A3_LEN));
+	seq = cpu_to_le16(*(unsigned short *)((unsigned char *)pframe + WLAN_HDR_A3_LEN + 2));
+	algorithm = cpu_to_le16(*(unsigned short *)((unsigned char *)pframe + WLAN_HDR_A3_LEN));
 
 	if (GetPrivacy(pframe))
 	{	
@@ -11398,10 +11398,11 @@ void free_mlme_ap_info(_adapter *padapter)
 
 	//free bc/mc sta_info
 	psta = rtw_get_bcmc_stainfo(padapter);	
-	_enter_critical_bh(&(pstapriv->sta_hash_lock), &irqL);		
-	rtw_free_stainfo(padapter, psta);
-	_exit_critical_bh(&(pstapriv->sta_hash_lock), &irqL);
-	
+	if(psta != NULL) {
+		_enter_critical_bh(&(pstapriv->sta_hash_lock), &irqL);
+		rtw_free_stainfo(padapter, psta);
+		_exit_critical_bh(&(pstapriv->sta_hash_lock), &irqL);
+	}	
 
 	_rtw_spinlock_free(&pmlmepriv->bcn_update_lock);
 	
